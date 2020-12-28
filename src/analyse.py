@@ -24,6 +24,8 @@ def whereIsClose(line):
 	return whereIs(line, '<CLOSE>')
 
 my_path = "data/daily/us/nasdaq stocks"
+#my_path = "data/daily/jp/tse stocks"
+after_date = 20201201
 
 files = glob.glob(my_path + '/**/*.txt', recursive=True)
 
@@ -48,11 +50,13 @@ for file in files:
 		for line in in_file:
 			tokens = line.split(',')
 			ticker_symbol = tokens[ticker_index]
-			x.append(int(tokens[date_index]))
-			y.append(float(tokens[close_index]))
+
+			if int(tokens[date_index]) >= after_date:
+				x.append(int(tokens[date_index]))
+				y.append(float(tokens[close_index]))
 
 
-	if len(x) != 0 or len(x) != 0:
+	if len(x) != 0:
 		slope, intercept, r, p, std_err = stats.linregress(x, y)
 #		print(ticker_symbol, slope, intercept, r, p, std_err)
 
