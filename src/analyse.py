@@ -25,7 +25,11 @@ def whereIsClose(line):
 
 my_path = "data/daily/us/nasdaq stocks"
 #my_path = "data/daily/jp/tse stocks"
+# do linear regression only after this date... (i.e. last 30 days of trade)
 after_date = 20201201
+
+# only include stocks that have been around since this date (i.e. 10 year old companies)
+been_around_since = 20100101
 
 files = glob.glob(my_path + '/**/*.txt', recursive=True)
 
@@ -39,24 +43,28 @@ for file in files:
 	y = []
 
 	ticker_symbol = ''
+	been_around_since_ok = False
 
 	with open(file, 'r') as in_file:
 		line = in_file.readline()
+
 		ticker_index = whereIsTicker(line)
 		date_index = whereIsDate(line)
 		close_index = whereIsClose(line)
 
-
 		for line in in_file:
 			tokens = line.split(',')
 			ticker_symbol = tokens[ticker_index]
+
+			if int(tokens[date_index]) < been_around_since:
+				been_around_since_ok = True
 
 			if int(tokens[date_index]) >= after_date:
 				x.append(int(tokens[date_index]))
 				y.append(float(tokens[close_index]))
 
 
-	if len(x) != 0:
+	if (len(x) != 0) and (been_around_since_ok == True):
 		slope, intercept, r, p, std_err = stats.linregress(x, y)
 #		print(ticker_symbol, slope, intercept, r, p, std_err)
 
